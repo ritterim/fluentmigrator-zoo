@@ -5,15 +5,28 @@ using System.Data.Entity;
 
 namespace Zoo.Models
 {
-    public class ZooDbContext : DbContext
+    public class ZooDbContext : DbContext, IZooDbContext
     {
         public ZooDbContext()
             :base(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString)
         {}
 
+        public ZooDbContext(string nameOrConnectionString)
+            : base(nameOrConnectionString)
+        {}
+
         public IDbSet<Enclosure> Enclosures { get; set; }
         public IDbSet<Animal> Animals { get; set; }
         public IDbSet<Keeper> Keepers { get; set; }
+    }
+
+    public interface IZooDbContext
+    {
+        IDbSet<Enclosure> Enclosures { get; set; }
+        IDbSet<Animal> Animals { get; set; }
+        IDbSet<Keeper> Keepers { get; set; }
+
+        int SaveChanges();
     }
 
     public class Enclosure

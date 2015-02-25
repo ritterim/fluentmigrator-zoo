@@ -7,23 +7,28 @@ namespace Zoo.Controllers
 {
     public class HomeController : Controller
     {
+        public virtual IZooDbContext Database { get; set; }
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            Database = new ZooDbContext();
+            base.OnActionExecuting(filterContext);
+        }
+
         public ActionResult Index()
         {
-            using (var db = new ZooDbContext())
+            var model = new IndexViewModel
             {
-                var model = new IndexViewModel
+                Animals = Database.Animals.Select(x => new AnimalWithEnclosureModel
                 {
-                    Animals = db.Animals.Select(x => new AnimalWithEnclosureModel
-                    {
-                        AnimalId = x.Id,
-                        EnclosureId = x.EnclosureId,
-                        AnimalName = x.Name,
-                        EnclosureName = x.Enclosure.Name
-                    }).ToList()
-                };
+                    AnimalId = x.Id,
+                    EnclosureId = x.EnclosureId,
+                    AnimalName = x.Name,
+                    EnclosureName = x.Enclosure.Name
+                }).ToList()
+            };
 
-                return View(model);
-            }
+            return View(model);
         }
     }
 }
