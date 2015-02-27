@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Web.Mvc;
 using Xunit;
-using Xunit.Sdk;
 using Zoo.Controllers;
 using Zoo.Models;
 
@@ -71,6 +71,16 @@ namespace Zoo.Tests
 
                 Assert.IsType<ViewResult>(result);
             }
+        }
+
+        [Fact]
+        public void Can_throw_an_exception_from_db_context()
+        {
+            var context = new FakeZooDbContext {
+                ThrowException = () => new DBConcurrencyException("someone changed the game on you")
+            };
+
+            Assert.Throws<DBConcurrencyException>(() => context.SaveChanges());
         }
     }
 }

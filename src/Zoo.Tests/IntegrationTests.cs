@@ -1,3 +1,4 @@
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Web.Mvc;
 using RimDev.Automation.Sql;
@@ -60,6 +61,32 @@ namespace Zoo.Tests
 
                     Assert.Equal(1, model.Animals.Count());
                     Assert.Equal("Nala", model.Animals.First().AnimalName);
+                }
+            }
+        }
+
+        [Fact]
+        public void Can_throw_an_exception()
+        {
+            using (var sandbox = new LocalDb())
+            {
+                Runner.MigrateToLatest(sandbox.ConnectionString);
+
+                using (var one = new ZooDbContext(sandbox.ConnectionString))
+                {
+                    var enclosure = new Enclosure {Environment = "Here", Name = "One", Location = "Here"};
+                    one.Enclosures.Add(enclosure);
+                    one.SaveChanges();
+
+                    using (var two = new ZooDbContext(sandbox.ConnectionString))
+                    {
+                        var change = two.Enclosures.Find(enclosure.Id);
+                        change.Name = "Changed";
+                        two.SaveChanges();
+                    }
+
+                    enclosure.Name = "Last Time";
+                    Assert.Throws<DbUpdateConcurrencyException>(() =>  one.SaveChanges());
                 }
             }
         }

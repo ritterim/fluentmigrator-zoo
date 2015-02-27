@@ -7,6 +7,8 @@ namespace Zoo.Tests
 {
     public class FakeZooDbContext : IZooDbContext, IDisposable
     {
+        public Func<Exception> ThrowException { get; set; }
+
         /// <summary>
         /// Sets up the fake database.
         /// </summary>
@@ -24,6 +26,9 @@ namespace Zoo.Tests
 
         public int SaveChanges()
         {
+            if (ThrowException != null)
+                throw ThrowException();
+
             // Pretend that each entity gets a database id when we hit save.
             int changes = 0;
             changes += DbSetHelper.IncrementPrimaryKey(x => x.Id, Enclosures);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Data.Entity;
 
@@ -32,6 +33,7 @@ namespace Zoo.Models
     public class Enclosure
     {
         public int Id { get; set; }
+        [ConcurrencyCheck]
         public string Name { get; set; }
         public string Location { get; set; }
         public string Environment { get; set; }
@@ -43,7 +45,7 @@ namespace Zoo.Models
     {
         public int Id { get; set; }
         public int EnclosureId { get; set; }
-        public virtual Enclosure Enclosure { get; set; }
+        public virtual Enclosure Enclosure { get; set; }        
         public string Name { get; set; }
         public string Species { get; set; }
         public DateTime Birthday { get; set; }

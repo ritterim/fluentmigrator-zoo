@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
@@ -46,6 +47,15 @@ namespace Zoo.Tests
             var result = controller.Index();
 
             Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void Can_throw_an_exception_from_a_mock()
+        {
+            var context = new Mock<IZooDbContext>();
+            context.Setup(db => db.SaveChanges()).Throws<DBConcurrencyException>();
+
+            Assert.Throws<DBConcurrencyException>(() => context.Object.SaveChanges());
         }
     }
 }
